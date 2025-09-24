@@ -9,7 +9,6 @@ interface PrintableDocumentProps {
   onClose: () => void;
   status?: Invoice['status'];
   isFinalizing?: boolean;
-  documentDate?: string;
 }
 
 const formatCurrency = (amount: number) => {
@@ -23,7 +22,7 @@ const MotorcycleIcon: React.FC<{className?: string}> = ({className}) => (
 );
 
 
-const PrintableDocument: React.FC<PrintableDocumentProps> = ({ type, items, totals, customerName, onClose, status, isFinalizing, documentDate }) => {
+const PrintableDocument: React.FC<PrintableDocumentProps> = ({ type, items, totals, customerName, onClose, status, isFinalizing }) => {
 
   const handlePrint = () => {
     window.print();
@@ -31,12 +30,11 @@ const PrintableDocument: React.FC<PrintableDocumentProps> = ({ type, items, tota
   };
 
   const isVoided = status === 'Voided';
-  const displayDate = documentDate ? new Date(documentDate).toLocaleDateString('es-CO') : new Date().toLocaleDateString('es-CO');
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-start z-50 p-4 overflow-y-auto">
-      <div className="bg-gray-200 p-4 sm:p-8 w-full max-w-4xl print:p-0">
-          <div className="bg-white shadow-lg p-6 sm:p-10 relative" id="printable-area">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-start z-50 p-4 overflow-y-auto print:bg-transparent print:p-0">
+      <div className="bg-gray-200 p-4 sm:p-8 w-full max-w-4xl print:p-0 print:bg-transparent print:shadow-none">
+          <div className="bg-white shadow-lg p-6 sm:p-10 relative print:shadow-none" id="printable-area">
               {isVoided && (
                 <div className="absolute inset-0 flex items-center justify-center z-0">
                     <p className="text-red-200 text-8xl md:text-9xl font-bold transform -rotate-45 select-none" style={{ opacity: 0.5 }}>
@@ -55,7 +53,7 @@ const PrintableDocument: React.FC<PrintableDocumentProps> = ({ type, items, tota
                     </div>
                     <div className="text-right">
                         <h2 className="text-3xl font-bold uppercase text-blue-600">{type}</h2>
-                        <p className="text-sm text-gray-600">Fecha: {displayDate}</p>
+                        <p className="text-sm text-gray-600">Fecha: {new Date().toLocaleDateString('es-CO')}</p>
                     </div>
                 </header>
 

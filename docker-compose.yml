@@ -1,0 +1,57 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./moto-repuestos-erp:/app
+      - /app/node_modules
+    command: sh -c "if [ ! -d node_modules ]; then npm ci; fi && npm run dev -- --host 0.0.0.0 --port 5173"
+ 
+  backend:
+    build:
+      context: ./moto-repuestos-backend
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost:8000
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=moto_repuestos
+      - DB_USERNAME=moto
+      - DB_PASSWORD=secret
+    volumes:
+      - ./moto-repuestos-backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+      - backend_node_modules:/var/www/html/node_modules
+    command: >-
+      sh -c "if [ ! -f artisan ]; then composer create-project laravel/laravel .; fi \
+      && php artisan serve --host 0.0.0.0 --port 8000"
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=moto_repuestos
+      - MYSQL_USER=moto
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  backend_vendor:
+  backend_node_modules:
+  mysql_data:

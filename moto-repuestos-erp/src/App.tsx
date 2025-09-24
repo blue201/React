@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { Product, ProductLocation, Invoice, CartItem, DocumentTotals } from './types';
 import Header from './components/Header';
 import InventoryView from './components/InventoryView';
 import SalesView from './components/SalesView';
+import LoginView from './components/LoginView';
 
 const initialProducts: Product[] = [
   { id: 'prod-001', name: 'Aceite Motul 5100 10W40', stock: 15, location: ProductLocation.Exhibidor, unitPrice: 35000 },
@@ -16,6 +18,7 @@ const initialProducts: Product[] = [
 type View = 'inventory' | 'sales';
 
 const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [salesHistory, setSalesHistory] = useState<Invoice[]>([]);
   const [currentView, setCurrentView] = useState<View>('sales');
@@ -80,10 +83,22 @@ const App: React.FC = () => {
     );
   };
 
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return <LoginView onLoginSuccess={handleLoginSuccess} />;
+  }
+
 
   return (
     <div className="min-h-screen font-sans">
-      <Header currentView={currentView} setCurrentView={setCurrentView} />
+      <Header currentView={currentView} setCurrentView={setCurrentView} onLogout={handleLogout} />
       <main className="p-4 md:p-8">
         {currentView === 'inventory' && <InventoryView products={products} onAddProduct={addProduct} onUpdateProduct={updateProduct} />}
         {currentView === 'sales' && <SalesView products={products} salesHistory={salesHistory} onRecordSale={recordSale} onVoidInvoice={voidInvoice} />}

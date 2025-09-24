@@ -16,10 +16,10 @@ const SearchIcon: React.FC<{className?: string}> = ({className}) => (
 );
 
 const EditIcon: React.FC<{className?: string}> = ({className}) => (
-  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
-      <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-      <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clipRule="evenodd" />
-  </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
+        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+        <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clipRule="evenodd" />
+    </svg>
 );
 
 
@@ -32,46 +32,46 @@ const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount);
 };
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit  }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit }) => {
     const priceWithVat = product.unitPrice * (1 + VAT_RATE);
     const locationColor = product.location === 'Bodega' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800';
 
     return (
-      <div 
-          className="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 cursor-pointer group"
-          onClick={() => onEdit(product)}
-          role="button"
-          aria-label={`Editar ${product.name}`}
-          tabIndex={0}
-          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onEdit(product)}>
-            
-          <div className="p-5 relative">
-               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-blue-500 text-white rounded-full p-1.5 shadow-lg">
-                  <EditIcon className="h-4 w-4" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-800 truncate pr-8">{product.name}</h3>
-              <p className="text-sm text-gray-500 mb-4">ID: {product.id}</p>
-              <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                      <span className="font-semibold text-gray-600">Existencia:</span>
-                      <span className="font-bold text-blue-600">{product.stock} unidades</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                      <span className="font-semibold text-gray-600">Ubicación:</span>
-                      <span className={`px-2 py-1 text-xs font-bold rounded-full ${locationColor}`}>{product.location}</span>
-                  </div>
-                  <div className="flex justify-between border-t pt-2 mt-2">
-                      <span className="font-semibold text-gray-600">Precio sin IVA:</span>
-                      <span className="text-gray-800">{formatCurrency(product.unitPrice)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                      <span className="font-semibold text-gray-600">Precio con IVA:</span>
-                      <span className="font-bold text-gray-900">{formatCurrency(priceWithVat)}</span>
-                  </div>
-              </div>
-          </div>
-      </div>
-  );
+        <div 
+            className="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 cursor-pointer group"
+            onClick={() => onEdit(product)}
+            role="button"
+            aria-label={`Editar ${product.name}`}
+            tabIndex={0}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onEdit(product)}
+        >
+            <div className="p-5 relative">
+                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-blue-500 text-white rounded-full p-1.5 shadow-lg">
+                    <EditIcon className="h-4 w-4" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-800 truncate pr-8">{product.name}</h3>
+                <p className="text-sm text-gray-500 mb-4">ID: {product.id}</p>
+                <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                        <span className="font-semibold text-gray-600">Existencia:</span>
+                        <span className="font-bold text-blue-600">{product.stock} unidades</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="font-semibold text-gray-600">Ubicación:</span>
+                        <span className={`px-2 py-1 text-xs font-bold rounded-full ${locationColor}`}>{product.location}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2 mt-2">
+                        <span className="font-semibold text-gray-600">Precio sin IVA:</span>
+                        <span className="text-gray-800">{formatCurrency(product.unitPrice)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="font-semibold text-gray-600">Precio con IVA:</span>
+                        <span className="font-bold text-gray-900">{formatCurrency(priceWithVat)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 
@@ -86,7 +86,6 @@ const InventoryView: React.FC<InventoryViewProps> = ({ products, onAddProduct, o
   const [searchTerm, setSearchTerm] = useState('');
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
 
-
   const filteredProducts = useMemo(() => {
     return products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [products, searchTerm]);
@@ -95,7 +94,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({ products, onAddProduct, o
     setProductToEdit(null);
     setIsFormOpen(true);
   };
-  
+
   const handleOpenEditForm = (product: Product) => {
     setProductToEdit(product);
     setIsFormOpen(true);
@@ -105,7 +104,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({ products, onAddProduct, o
     setIsFormOpen(false);
     setProductToEdit(null);
   };
-  
+
   const handleFormSubmit = (productData: Omit<Product, 'id'> | Product) => {
     if ('id' in productData) {
       onUpdateProduct(productData as Product);
@@ -130,7 +129,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({ products, onAddProduct, o
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         </div>
         <button
-          onClick={() => setIsFormOpen(true)}
+          onClick={handleOpenAddForm}
           className="w-full md:w-auto bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
         >
           <PlusIcon className="w-5 h-5" />
@@ -141,7 +140,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({ products, onAddProduct, o
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map(product => (
-                <ProductCard key={product.id} product={product} onEdit={handleOpenEditForm}/>
+                <ProductCard key={product.id} product={product} onEdit={handleOpenEditForm} />
             ))}
         </div>
       ) : (
@@ -153,16 +152,11 @@ const InventoryView: React.FC<InventoryViewProps> = ({ products, onAddProduct, o
 
 
       {isFormOpen && (
-        // <ProductForm
-        //   onClose={() => setIsFormOpen(false)}
-        //   onAddProduct={onAddProduct}
-        // />
         <ProductForm
           onClose={handleCloseForm}
           onSubmit={handleFormSubmit}
           productToEdit={productToEdit}
         />
-
       )}
     </div>
   );

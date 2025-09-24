@@ -13,12 +13,6 @@ const formatCurrency = (amount: number) => {
 
 // --- Helper Components ---
 
-const SearchIcon: React.FC<{className?: string}> = ({className}) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
-        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-    </svg>
-);
-
 const ProductSelectorItem: React.FC<{ product: Product; onAdd: (product: Product) => void; }> = ({ product, onAdd }) => (
     <div 
         className="flex justify-between items-center p-3 bg-white hover:bg-sky-50 rounded-lg cursor-pointer transition-colors duration-200"
@@ -102,17 +96,10 @@ interface SalesViewProps {
 const SalesView: React.FC<SalesViewProps> = ({ products, salesHistory, onRecordSale, onVoidInvoice }) => {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [customerName, setCustomerName] = useState('');
-    const [productSearchTerm, setProductSearchTerm] = useState('');
-    const [documentToPrint, setDocumentToPrint] = useState<{type: DocumentType, items: CartItem[], totals: DocumentTotals, customer: string, isReprint: boolean, status?: Invoice['status'], issuedAt?: string} | null>(null);
+    const [documentToPrint, setDocumentToPrint] = useState<{type: DocumentType, items: CartItem[], totals: DocumentTotals, customer: string, isReprint: boolean, status?: Invoice['status']} | null>(null);
     const [showDailyReport, setShowDailyReport] = useState(false);
 
     const productMap = useMemo(() => new Map(products.map(p => [p.id, p])), [products]);
-
-    const filteredProducts = useMemo(() => {
-        return products
-            .filter(p => p.stock > 0)
-            .filter(p => p.name.toLowerCase().includes(productSearchTerm.toLowerCase()));
-    }, [products, productSearchTerm]);
 
     const addToCart = useCallback((product: Product) => {
         setCart(prevCart => {
@@ -124,21 +111,6 @@ const SalesView: React.FC<SalesViewProps> = ({ products, salesHistory, onRecordS
             return [...prevCart, { id: product.id, name: product.name, unitPrice: product.unitPrice, quantity: 1 }];
         });
     }, []);
-
-    const checkStockAvailability = useCallback((items: CartItem[]) => {
-        const insufficientItems = items.filter(item => {
-            const product = productMap.get(item.id);
-            return !product || product.stock < item.quantity;
-        });
-
-        if (insufficientItems.length > 0) {
-            const productNames = insufficientItems.map(item => item.name).join(', ');
-            alert(`No hay suficiente inventario para: ${productNames}. Ajusta las cantidades antes de generar la factura.`);
-            return false;
-        }
-
-        return true;
-    }, [productMap]);
 
     const updateCartQuantity = useCallback((productId: string, newQuantity: number) => {
         setCart(prevCart => prevCart.map(item => item.id === productId ? { ...item, quantity: newQuantity } : item));
@@ -156,36 +128,19 @@ const SalesView: React.FC<SalesViewProps> = ({ products, salesHistory, onRecordS
     }, [cart]);
 
     const handleGenerateDocument = (type: DocumentType) => {
-        if (cart.length === 0) {
+        if(type === 'Factura' && !customerName.trim()){
+            alert('Por favor, ingrese el nombre del cliente para generar una factura.');
             return;
         }
-
-        if(type === 'Factura') {
-            if (!customerName.trim()){
-                alert('Por favor, ingrese el nombre del cliente para generar una factura.');
-                return;
-            }
-
-            if (!checkStockAvailability(cart)) {
-                return;
-            }
-        }
-
-        const issuedAt = new Date().toISOString();
-        setDocumentToPrint({ type, items: cart, totals, customer: customerName, isReprint: false, status: 'Completed', issuedAt });
+        setDocumentToPrint({ type, items: cart, totals, customer: customerName, isReprint: false, status: 'Completed' });
     };
 
     const handleReprintInvoice = (invoice: Invoice) => {
-        setDocumentToPrint({ type: 'Factura', items: invoice.items, totals: invoice.totals, customer: invoice.customerName, isReprint: true, status: invoice.status, issuedAt: invoice.date });
+        setDocumentToPrint({ type: 'Factura', items: invoice.items, totals: invoice.totals, customer: invoice.customerName, isReprint: true, status: invoice.status });
     };
 
     const handleClosePrintView = () => {
         if (documentToPrint?.type === 'Factura' && !documentToPrint.isReprint) {
-            if (!checkStockAvailability(documentToPrint.items)) {
-                setDocumentToPrint(null);
-                return;
-            }
-
             onRecordSale({
                 customerName: documentToPrint.customer,
                 items: documentToPrint.items,
@@ -201,24 +156,10 @@ const SalesView: React.FC<SalesViewProps> = ({ products, salesHistory, onRecordS
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <div className="lg:col-span-2 bg-white p-4 rounded-xl shadow-lg">
                 <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Seleccionar Productos</h2>
-                <div className="relative mb-4">
-                    <input
-                        type="text"
-                        placeholder="Buscar producto..."
-                        value={productSearchTerm}
-                        onChange={(e) => setProductSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                </div>
-                <div className="space-y-2 h-[calc(80vh-5rem)] overflow-y-auto pr-2">
-                    {filteredProducts.length > 0 ? (
-                        filteredProducts.map(product => (
-                           <ProductSelectorItem key={product.id} product={product} onAdd={addToCart} />
-                        ))
-                    ) : (
-                        <p className="text-center text-gray-500 pt-10">No se encontraron productos.</p>
-                    )}
+                <div className="space-y-2 h-[80vh] overflow-y-auto pr-2">
+                    {products.filter(p => p.stock > 0).map(product => (
+                       <ProductSelectorItem key={product.id} product={product} onAdd={addToCart} />
+                    ))}
                 </div>
             </div>
 
@@ -281,7 +222,6 @@ const SalesView: React.FC<SalesViewProps> = ({ products, salesHistory, onRecordS
                     customerName={documentToPrint.customer}
                     status={documentToPrint.status}
                     isFinalizing={documentToPrint.type === 'Factura' && !documentToPrint.isReprint}
-                    documentDate={documentToPrint.issuedAt}
                     onClose={handleClosePrintView}
                 />
             )}
