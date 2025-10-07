@@ -42,7 +42,7 @@ services:
   mysql:
     image: mysql:8.0
     ports:
-      - "3306:3306"
+      - "3308:3306"
     environment:
       - MYSQL_DATABASE=moto_repuestos
       - MYSQL_USER=moto
