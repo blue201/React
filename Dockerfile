@@ -1,5 +1,8 @@
 # Imagen base ligera compatible con Apple Silicon (multi-arch)
-FROM node:20-alpine
+FROM node:22-alpine
+
+# Actualizamos paquetes del sistema para aplicar parches de seguridad recientes
+RUN apk update && apk upgrade --no-cache
 
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
@@ -18,3 +21,6 @@ EXPOSE 5173
 
 # Ejecutamos Vite en modo desarrollo accesible desde la red
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+
+
+

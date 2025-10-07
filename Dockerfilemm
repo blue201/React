@@ -1,5 +1,5 @@
 # Imagen base PHP 8.3 con FPM sobre Alpine, ligera y multi-arquitectura (Apple Silicon compatible)
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Instala dependencias del sistema necesarias para Laravel
 RUN apk add --no-cache \
